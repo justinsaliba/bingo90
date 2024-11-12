@@ -2,13 +2,21 @@ package com.lindar.challenges.jsaliba.beans;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Random;
 
 public class CollectionShuffler {
 
-    public static <T> List<T> shuffle(List<T> input) {
-            Collections.shuffle(input);
-            return input;
+    /**
+     * A utility method to shuffle a list against a given
+     * Random implementation.
+     *
+     * @param input The input list
+     * @param random A {@link java.util.Random} to control randomness
+     * @return The shuffled, input list.
+     */
+    public static <T> List<T> shuffle(List<T> input, Random random) {
+        Collections.shuffle(input, random);
+        return input;
     }
 
 }

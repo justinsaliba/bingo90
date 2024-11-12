@@ -1,39 +1,50 @@
 package com.lindar.challenges.jsaliba.beans;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static com.lindar.challenges.jsaliba.beans.TicketStrip.BLANK;
 
 public class Ticket {
 
     public static final int MAX_NUMBERS = 15;
+    public static final int ROWS = 3;
+    public static final int COLUMNS = 9;
 
-    private int ticketNumber;
-    private Map<Integer, TreeSet<Integer>> columns;
-    private int totalNumbers;
+    private final int ticketNumber;
+    private final Map<Integer, LinkedList<Integer>> columns = IntStream
+                                                            .range(0, COLUMNS)
+                                                            .boxed()
+                                                            .collect(Collectors.toMap(idx -> idx, idx -> new LinkedList<>() ));
+
+    private int totalNumbers = 0;
 
     public Ticket(int ticketNumber) {
         this.ticketNumber = ticketNumber;
-        columns = new HashMap<>();
-        totalNumbers = 0;
-
-        for (int i = 0; i < 9; i++) {
-            columns.put(i, new TreeSet<>());
-        }
     }
 
-    public Collection<TreeSet<Integer>> getColumns() {
-        return columns.values();
+    public Map<Integer, LinkedList<Integer>> getColumns() {
+        return columns;
+    }
+
+    public Map<Integer, LinkedList<Integer>> getRows() {
+        final Map<Integer, LinkedList<Integer>> rows = new HashMap<>();
+        for (int i = 0; i < ROWS; i++) {
+            LinkedList<Integer> row = new LinkedList<>();
+            for (int j = 0; j < COLUMNS; j++) {
+                row.add(columns.get(j).get(i));
+            }
+            rows.put(i, row);
+        }
+        return rows;
     }
 
     public int getTicketNumber() {
         return ticketNumber;
     }
 
-    public int getTotalNumbers() {
-        return totalNumbers;
-    }
-
-    public Set<Integer> getColumnNumbers(int columnNumber) {
+    public LinkedList<Integer> getColumnNumbers(int columnNumber) {
         return columns.get(columnNumber);
     }
 
@@ -42,108 +53,45 @@ public class Ticket {
         return columnSize == 3;
     }
 
-    public void insertNumber(int number) {
-        int columnNumber = this.findNumberPlacement(number);
-
+    public void insertNumber(int columnNumber, int number) {
         columns.get(columnNumber).add(number);
         totalNumbers++;
-//        System.out.printf("[Ticket %s] Inserted %s into column %s\n", ticketNumber, number, columnNumber);
     }
 
     public boolean isComplete() {
         return totalNumbers == MAX_NUMBERS;
     }
 
-    public int findNumberPlacement(int number) {
-        if (number <= 9) return 0;
-        else if (number >= 80) return 8;
-        else return number / 10;
-    }
-
-    @Override
     public String toString() {
-        return String.format("Ticket [ticketNumber=%s, count=%s, columns=%s]", ticketNumber, totalNumbers, columns);
-    }
 
-    public static final class TicketColumn {
-        private int columnNumber;
-        private TreeSet<Integer> values;
+        int charactersInALine = 34; // 2 chars per number + 2 whitespaces between each ...
 
-        public TicketColumn(int columnNumber) {
-            this.columnNumber = columnNumber;
-            values = new TreeSet<>();
-        }
+        final StringBuilder printedTicket  = new StringBuilder();
+        printedTicket
+          .append("   ")
+          .append("-".repeat(charactersInALine))
+          .append("   ")
+          .append(System.lineSeparator());
 
-        public int getColumnNumber() {
-            return columnNumber;
-        }
-
-        public TreeSet<Integer> getValues() {
-            return values;
-        }
-
-        public boolean hasSpaceRemaining() {
-            return values.size() < 3;
-        }
-
-        public boolean isFull() {
-            return !hasSpaceRemaining();
-        }
-    }
-
-    public static final class PrintableTicket {
-
-        private final int[][] ticketGrid = new int[9][3];
-
-        public PrintableTicket(Ticket ticket) {
-            final AtomicInteger positionStartSeed = new AtomicInteger(new Random().nextInt(3));
-            ticket.columns.entrySet()
-              .stream()
-              .forEach( e -> {
-
-                  TreeSet<Integer> columnNumbers = e.getValue();
-                  if (columnNumbers.size() == 3) {
-                      ticketGrid[e.getKey()] = new int[] { columnNumbers.pollFirst(), columnNumbers.pollFirst(), columnNumbers.pollFirst() };
-                      return;
-                  }
-
-                  // init the grid with blank values
-                  ticketGrid[e.getKey()] = new int[] { -1, -1, -1 };
-
-                  int previousStartingPosition = positionStartSeed.get() % 3;
-                  int nextStartingPosition = positionStartSeed.incrementAndGet() % 3;
-
-                  if (columnNumbers.size() == 1) {
-                      int soleNumber = columnNumbers.first();
-                      ticketGrid[e.getKey()][nextStartingPosition] = soleNumber;
-                  }
-
-                  if (columnNumbers.size() == 2) {
-                      int firstNumber = columnNumbers.first();
-                      int secondNumber = columnNumbers.last();
-
-                      if (previousStartingPosition == 0)
-                          ticketGrid[e.getKey()] = new int[] { -1, firstNumber, secondNumber };
-
-                      if (previousStartingPosition == 1)
-                          ticketGrid[e.getKey()] = new int[] { firstNumber, -1, secondNumber };
-
-                      if (previousStartingPosition == 2)
-                          ticketGrid[e.getKey()] = new int[] { firstNumber, secondNumber, -1 };
-
-                      positionStartSeed.incrementAndGet();
-                  }
-
-              });
-        }
-
-        public void print() {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 9; j++) {
-                    System.out.printf("%s\t", ticketGrid[j][i]);
-                }
-                System.out.println();
+        for (int i = 0; i < ROWS; i++) {
+            printedTicket.append(" | ");
+            for (int j = 0; j < COLUMNS; j++) {
+                int number = columns.get(j).get(i);
+                printedTicket.append(String.format("%2s  ", number != BLANK ? number : ""));
             }
+
+            printedTicket.append("| ");
+            printedTicket.append(System.lineSeparator());
         }
+
+        printedTicket
+          .append("   ")
+          .append("-".repeat(charactersInALine))
+          .append("   ");
+
+        printedTicket.append(System.lineSeparator());
+
+        return printedTicket.toString();
     }
+
 }
