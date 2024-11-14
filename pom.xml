@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.lindar.challenges</groupId>
-	<artifactId>jsaliba-ticket-generator-challenge</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>jsaliba-ticket-generator-challenge</name>
+	<artifactId>bingo90</artifactId>
+	<version>1.0</version>
+	<name>bingo90</name>
 
 	<properties>
 		<java.version>17</java.version>
@@ -31,13 +31,11 @@
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-core</artifactId>
 			<version>1.37</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-generator-annprocess</artifactId>
 			<version>1.37</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>

@@ -1,6 +1,5 @@
 package com.lindar.challenges.jsaliba;
 
-import com.lindar.challenges.jsaliba.beans.TicketStrip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -19,11 +18,13 @@ public class TicketGenerator implements ApplicationRunner {
 		SpringApplication.run(TicketGenerator.class, args);
 	}
 
+	private int strips;
+	private boolean verbose;
+	private int generations;
+
 	@Override
 	public void run(ApplicationArguments args) {
-		int strips = args.containsOption("strips") ? Integer.parseInt(args.getOptionValues("strips").get(0)) : 1;
-		boolean verbose = args.containsOption("verbose") ? Boolean.parseBoolean(args.getOptionValues("verbose").get(0)) : false;
-		int generations = args.containsOption("generations") ? Integer.parseInt(args.getOptionValues("generations").get(0)) : 1;
+		parseInput(args);
 
 		for (int i = 0; i < generations; i++) {
 			long now = System.currentTimeMillis();
@@ -31,6 +32,29 @@ public class TicketGenerator implements ApplicationRunner {
 			long then = System.currentTimeMillis();
 			LOGGER.info("Took {} ms to generate {} ticket strips", then - now, strips);
 		}
+	}
+
+	private void parseInput(ApplicationArguments args) {
+		if (args.containsOption("strips")) {
+			strips = Integer.parseInt(args.getOptionValues("strips").get(0));
+		}
+		else strips = 10000;
+
+		if (args.containsOption("generations")) {
+			generations = Integer.parseInt(args.getOptionValues("generations").get(0));
+		}
+		else generations = 1;
+
+		if (args.containsOption("verbose")) {
+			if (args.getOptionValues("verbose").size() > 0) {
+				if (args.getOptionValues("verbose").get(0).trim().equalsIgnoreCase("true")) {
+					verbose = true;
+				}
+				else verbose = false;
+			}
+			else verbose = true;
+		}
+		else verbose = false;
 	}
 
 	private void generateStrips(int strips, boolean verbose) {

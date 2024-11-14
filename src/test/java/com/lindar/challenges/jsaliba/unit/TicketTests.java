@@ -1,7 +1,6 @@
 package com.lindar.challenges.jsaliba.unit;
 
-import com.lindar.challenges.jsaliba.beans.Ticket;
-import org.hamcrest.Matchers;
+import com.lindar.challenges.jsaliba.Ticket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +31,8 @@ public class TicketTests {
     @Test
     public void testInsertedNumbersArePlacedInTheAppropriateColumn() {
         ticket.insertNumber(1, 1);
-        ticket.insertNumber(2,2);
-        ticket.insertNumber(3,3);
+        ticket.insertNumber(2, 2);
+        ticket.insertNumber(3, 3);
 
         assertThat(ticket.getColumnNumbers(1), contains(1));
         assertThat(ticket.getColumnNumbers(2), contains(2));

@@ -1,6 +1,7 @@
-package com.lindar.challenges.jsaliba.perf;
+package com.lindar.challenges.jsaliba.unit.perf;
 
-import com.lindar.challenges.jsaliba.beans.TicketStrip;
+import com.lindar.challenges.jsaliba.TicketStrip;
+import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -9,7 +10,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
 
-public class JMHBenchmarks {
+public class JMHBenchmarkTests {
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
@@ -27,9 +28,10 @@ public class JMHBenchmarks {
         for (int i = 0; i < 10000; i++) { new TicketStrip(); }
     }
 
-    public static void main(String[] args) throws RunnerException {
+    @Test
+    public void executeJMHRunner() throws RunnerException {
         final Options opt = new OptionsBuilder()
-          .include(JMHBenchmarks.class.getSimpleName())
+          .include(JMHBenchmarkTests.class.getSimpleName())
           // can configure garbage collector to have larger NewGen given that
           // TicketStrips are short-lived, and it wouldn't make sense to have
           // these go into the OldGen portion of memory.
@@ -39,6 +41,5 @@ public class JMHBenchmarks {
 
         new Runner(opt).run();
     }
-
 
 }

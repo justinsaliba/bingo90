@@ -1,8 +1,7 @@
-package com.lindar.challenges.jsaliba.beans;
+package com.lindar.challenges.jsaliba;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static java.lang.System.lineSeparator;
@@ -40,87 +39,47 @@ public class TicketStrip {
             this.populateTicket(ticket);
         }
 
-        //
-        // 36 numbers remaining to be spread amongst 6 tickets ...
-        //
-        // Complete the first three tickets using random numbers
-        // from any group as long as the ticket cannot have more than
-        // 3 numbers from the same group.
-        //
-        // Leaving us with ...
-        //
-        // 18 numbers remaining to be spread amongst 3 tickets ...
-        //
-        // Start eating away from the larger groups for subsequent groups
-        // There is a chance that the 9th group might have 5 elements on a bad day
-        // So forcefully assign a number from the 9th group to the 4th ticket
-        // if that is the case. Collect the remaining numbers as normal.
-        //
+        // Should technically always be 36 ...
+        int remainingNumbers = 90 - tickets.stream().mapToInt(Ticket::getTotalNumbers).reduce(0, Integer::sum);
+
+        for (int i = remainingNumbers - 1; i >= 0; i--) {
+            int nextNumberGroup = i % 9;
+            LinkedList<Integer> numbersInGroup = numberPool.get(nextNumberGroup);
+
+            // Quick workaround for unevenly-sized columns
+            if (numbersInGroup.isEmpty()) {
+                final Map.Entry<Integer, LinkedList<Integer>> nonEmptyColumn = numberPool.entrySet().stream().filter(grp -> !grp.getValue().isEmpty()).findFirst().get();
+                nextNumberGroup = nonEmptyColumn.getKey();
+                numbersInGroup = nonEmptyColumn.getValue();
+            }
+
+            final int finalNextNumberGroup = nextNumberGroup;
+            final Optional<Ticket> maybeTicket = tickets.stream().filter(ticket -> !ticket.isComplete() && !ticket.isColumnFull(finalNextNumberGroup)).findFirst();
+
+            final Ticket ticket = maybeTicket.orElseThrow(() -> new RuntimeException("This shouldn't happen ... "));
+
+            ticket.insertNumber(nextNumberGroup, numbersInGroup.removeFirst());
+        }
 
         for (Ticket ticket : tickets) {
-            completeTicket(ticket);
             addEmptySpaces(ticket);
         }
     }
 
-    // Assign a number to every column to every one of the
-    // six tickets in the ticket strip. This will ensure that
-    // all tickets adhere to the requirement of having at least
-    // one number in every column ... rest of the numbers will
-    // be sorted out later.
-    private void populateTicket(Ticket ticket) {
-        ticket.getColumns().forEach( (columnIdx, columnNumbers) -> {
-            ticket.insertNumber(columnIdx, numberPool.get(columnIdx).removeFirst());
-        });
-    }
-
-    private void completeTicket(Ticket ticket) {
-        if (ticket.getTicketNumber() == 4) {
-            if (numberPool.get(8).size() > 4) {
-                ticket.insertNumber(8, numberPool.get(8).removeFirst());
-            }
-        }
-
-        if (ticket.getTicketNumber() == 5) {
-            numberPool.entrySet()
-                .stream()
-                .filter(numbersInGroup -> numbersInGroup.getValue().size() > 2)
-                .forEach(numberGroup -> {
-                    final Integer groupNumber = numberGroup.getKey();
-                    final LinkedList<Integer> numbersInGroup = numberPool.get(groupNumber);
-
-                    while (numbersInGroup.size() > 2) {
-                        ticket.insertNumber(groupNumber, numbersInGroup.removeFirst());
-                    }
-                });
-        }
-
-        while (!ticket.isComplete()) {
-
-            final List<Map.Entry<Integer, LinkedList<Integer>>> applicableNumberGroups = numberPool.entrySet()
-              .stream()
-              .filter(e -> !e.getValue().isEmpty() && !ticket.isColumnFull(e.getKey()))
-              // Avoid using just toList() because it causes the first few tickets to eagerly consume
-              // from the smaller-numbered columns. So, add a bit of randomness by shuffling the list
-              // of columns applicable to the ticket, and select a random one.
-              //
-              // TODO: Check if there is a way to avoid looping until the ticket is complete.
-              .collect(collectingAndThen(toList(), (theList) -> CollectionShuffler.shuffle(theList, random)))
-              ;
-
-            final Map.Entry<Integer, LinkedList<Integer>> firstGroup = applicableNumberGroups.get(0);
-            ticket.insertNumber(firstGroup.getKey(), firstGroup.getValue().removeFirst());
-        }
-    }
-
     public void addEmptySpaces(Ticket ticket) {
-        // Something to keep track where the
+        // Something to keep track where the last column started placing numbers.
+        // If column 0 started at row 0, column 1 will start at row 1.
+        // If column 0 started at row 2, column 1 will start at row 0.
+        // The positionStartSeed is randomised to introduce a bit of indeterminism,
+        // since the first column impacts the number positioning of subsequent columns.
+        //
         final AtomicInteger positionStartSeed = new AtomicInteger(random.nextInt(3));
 
         ticket
           .getColumns()
           .forEach( (columnIdx, columnNumbers) -> {
               if (columnNumbers.size() == 3) {
+                  // No blank spaces to add ... just sort the column and continue with the next.
                   columnNumbers.sort(Integer::compareTo);
                   return;
               }
@@ -128,6 +87,8 @@ public class TicketStrip {
               final int previousStartingPosition = positionStartSeed.get() % 3;
               final int nextStartingPosition = positionStartSeed.incrementAndGet() % 3;
 
+              // If there's only one number in the column, add blank spaces
+              // depending on where the previous column placed its last number.
               if (columnNumbers.size() == 1) {
                   if (nextStartingPosition == 0) {
                       columnNumbers.addLast(BLANK);
@@ -144,6 +105,9 @@ public class TicketStrip {
                   return;
               }
 
+              // If there are two numbers in the column, swap the numbers
+              // if the first is larger than the second. Add a blank space
+              // depending on where the previous column placed its last number
               if (columnNumbers.size() == 2) {
                   final int firstNumber = columnNumbers.getFirst();
                   final int secondNumber = columnNumbers.getLast();
@@ -163,9 +127,24 @@ public class TicketStrip {
                   else if (previousStartingPosition == 2) {
                       columnNumbers.addLast(BLANK);
                   }
+
+                  // Remember to call incrementAndGet() a second time, otherwise
+                  // the subsequent column will place its first number alongside
+                  // the second number of this column.
                   positionStartSeed.incrementAndGet();
               }
           });
+    }
+
+    // Assign a number to every column to every one of the
+    // six tickets in the ticket strip. This will ensure that
+    // all tickets adhere to the requirement of having at least
+    // one number in every column ... rest of the numbers will
+    // be sorted out later.
+    private void populateTicket(Ticket ticket) {
+        ticket.getColumns().forEach( (columnIdx, columnNumbers) -> {
+            ticket.insertNumber(columnIdx, numberPool.get(columnIdx).removeFirst());
+        });
     }
 
     public final Map<Integer, LinkedList<Integer>> buildNumberPool() {

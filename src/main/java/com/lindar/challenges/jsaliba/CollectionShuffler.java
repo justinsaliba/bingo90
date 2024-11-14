@@ -1,4 +1,4 @@
-package com.lindar.challenges.jsaliba.beans;
+package com.lindar.challenges.jsaliba;
 
 import java.util.Collections;
 import java.util.List;

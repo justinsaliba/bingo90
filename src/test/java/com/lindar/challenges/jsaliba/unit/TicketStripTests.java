@@ -1,6 +1,6 @@
 package com.lindar.challenges.jsaliba.unit;
 
-import com.lindar.challenges.jsaliba.beans.TicketStrip;
+import com.lindar.challenges.jsaliba.TicketStrip;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.lindar.challenges.jsaliba.beans.TicketStrip.BLANK;
+import static com.lindar.challenges.jsaliba.TicketStrip.BLANK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 

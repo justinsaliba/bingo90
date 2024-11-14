@@ -1,10 +1,10 @@
-package com.lindar.challenges.jsaliba.beans;
+package com.lindar.challenges.jsaliba;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.lindar.challenges.jsaliba.beans.TicketStrip.BLANK;
+import static com.lindar.challenges.jsaliba.TicketStrip.BLANK;
 
 public class Ticket {
 
@@ -62,22 +62,26 @@ public class Ticket {
         return totalNumbers == MAX_NUMBERS;
     }
 
+    public int getTotalNumbers() {
+        return totalNumbers;
+    }
+
     public String toString() {
 
-        int charactersInALine = 34; // 2 chars per number + 2 whitespaces between each ...
+        int charactersInALine = 37; // 2 chars per number + 2 whitespaces between each ...
 
         final StringBuilder printedTicket  = new StringBuilder();
         printedTicket
-          .append("   ")
+          .append(" ")
           .append("-".repeat(charactersInALine))
-          .append("   ")
+          .append(" ")
           .append(System.lineSeparator());
 
         for (int i = 0; i < ROWS; i++) {
-            printedTicket.append(" | ");
+            printedTicket.append("| ");
             for (int j = 0; j < COLUMNS; j++) {
                 int number = columns.get(j).get(i);
-                printedTicket.append(String.format("%2s  ", number != BLANK ? number : ""));
+                printedTicket.append(String.format("%2s  ", number != BLANK ? number : "--"));
             }
 
             printedTicket.append("| ");
@@ -85,9 +89,9 @@ public class Ticket {
         }
 
         printedTicket
-          .append("   ")
+          .append(" ")
           .append("-".repeat(charactersInALine))
-          .append("   ");
+          .append(" ");
 
         printedTicket.append(System.lineSeparator());
 
