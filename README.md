@@ -20,7 +20,7 @@ This is an application that is used to generate Bingo 90 cards according to the 
 To run the project, simply build the application via Maven, and execute the JAR's entry point:
 
 ```bash
-$ mvn clean package
+$ ./mvnw clean package
 
 $ java -jar target/bingo90-1.0.jar
 ```
@@ -188,7 +188,7 @@ The application houses two JMH benchmarks in the test class `JMHBenchmarkTests`,
 2. The time taken for four threads to generate 10000 strips
 
 Either test emits the average time taken to perform each time. Since this can be somewhat annoying when wanting
-to execute the app, you may simply skip these tests using `mvn package -DskipTests` to generate the JAR and skipping
+to execute the app, you may simply skip these tests using `./mvnw package -DskipTests` to generate the JAR and skipping
 over JMH. Note that this will also skip over other JUnit tests in the project.
 
 These are the test results obtained on a Lenovo Legion 15 Pro equipped with an AMD Ryzen 9 7945X (16 physical cores,
