@@ -32,6 +32,7 @@ public class TicketGenerator implements ApplicationRunner {
 		}
 		catch (ValidationException e) {
 			LOGGER.error(e.getMessage());
+			return;
 		}
 
 		for (int i = 0; i < generations; i++) {

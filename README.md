@@ -26,7 +26,9 @@ $ java -jar target/bingo90-1.0.jar
 ```
 
 By default, the app will generate 10000 strips and emit the time taken to do so.
-Due to classloading, and just-in-time compilation typical of Java programs.
+Due to classloading, and just-in-time compilation typical of Java programs, expanding heap, and so on,
+the number might seem high at first, but this number will eventually go down once the JVM warms up.
+The app provides certain command line arguments to do so. Please read on.
 
 Keeping things simple, this app exposes a number of flags to manipulate the program's output, as follows:
 
@@ -46,7 +48,7 @@ The command above will generate 10000 strips, 10000 times emitting, the average 
 
 > <span style="color:cornflowerblue">🛈 Note</span>
 >
-> Please ensure that you specify the `=` between the flag and its respective value. Failing to do so will lead to very ugly stack traces (:.
+> Please ensure that you specify the `=` between the flag and its respective value. Failing to do so cause the app to exit with an error.
 
 Example output:
 
