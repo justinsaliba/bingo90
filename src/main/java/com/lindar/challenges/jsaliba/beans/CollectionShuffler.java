@@ -1,4 +1,4 @@
-package com.lindar.challenges.jsaliba;
+package com.lindar.challenges.jsaliba.beans;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +9,8 @@ public class CollectionShuffler {
     /**
      * A utility method to shuffle a list against a given
      * Random implementation.
+     *
+     * See <a href="https://bugs.openjdk.org/browse/JDK-8294693">JDK-8294693</a>
      *
      * @param input The input list
      * @param random A {@link java.util.Random} to control randomness

@@ -1,5 +1,7 @@
 package com.lindar.challenges.jsaliba;
 
+import com.lindar.challenges.jsaliba.beans.TicketStrip;
+import com.lindar.challenges.jsaliba.beans.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -7,6 +9,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 @SpringBootApplication
@@ -24,7 +27,12 @@ public class TicketGenerator implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		parseInput(args);
+		try {
+			parseInput(args);
+		}
+		catch (ValidationException e) {
+			LOGGER.error(e.getMessage());
+		}
 
 		for (int i = 0; i < generations; i++) {
 			long now = System.currentTimeMillis();
@@ -35,22 +43,31 @@ public class TicketGenerator implements ApplicationRunner {
 	}
 
 	private void parseInput(ApplicationArguments args) {
+
+		LOGGER.info("Parsing arguments: [{}]", args.getSourceArgs());
+
 		if (args.containsOption("strips")) {
-			strips = Integer.parseInt(args.getOptionValues("strips").get(0));
+			if (args.getOptionValues("strips").isEmpty()) {
+				throw new ValidationException("No strips given, please specify strips: 'strips=1000'");
+			}
+			final String stripsOption = args.getOptionValues("strips").get(0);
+			strips = Integer.parseInt(stripsOption);
 		}
 		else strips = 10000;
 
 		if (args.containsOption("generations")) {
-			generations = Integer.parseInt(args.getOptionValues("generations").get(0));
+			if (args.getOptionValues("generations").isEmpty()) {
+				throw new ValidationException("No generations given, please specify generations: 'generations=1000'");
+			}
+			final String generationsOption = args.getOptionValues("generations").get(0);
+			generations = Integer.parseInt(generationsOption);
 		}
 		else generations = 1;
 
 		if (args.containsOption("verbose")) {
-			if (args.getOptionValues("verbose").size() > 0) {
-				if (args.getOptionValues("verbose").get(0).trim().equalsIgnoreCase("true")) {
-					verbose = true;
-				}
-				else verbose = false;
+			final List<String> verboseOption = args.getOptionValues("verbose");
+			if (!verboseOption.isEmpty()) {
+                verbose = verboseOption.get(0).trim().equalsIgnoreCase("true");
 			}
 			else verbose = true;
 		}

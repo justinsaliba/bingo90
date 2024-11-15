@@ -1,10 +1,10 @@
-package com.lindar.challenges.jsaliba;
+package com.lindar.challenges.jsaliba.beans;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.lindar.challenges.jsaliba.TicketStrip.BLANK;
+import static com.lindar.challenges.jsaliba.beans.TicketStrip.BLANK;
 
 public class Ticket {
 

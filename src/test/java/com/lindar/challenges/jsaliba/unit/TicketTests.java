@@ -1,6 +1,6 @@
 package com.lindar.challenges.jsaliba.unit;
 
-import com.lindar.challenges.jsaliba.Ticket;
+import com.lindar.challenges.jsaliba.beans.Ticket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

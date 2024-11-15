@@ -1,6 +1,6 @@
 package com.lindar.challenges.jsaliba.unit.perf;
 
-import com.lindar.challenges.jsaliba.TicketStrip;
+import com.lindar.challenges.jsaliba.beans.TicketStrip;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
