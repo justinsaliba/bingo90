@@ -267,3 +267,8 @@ Result "com.lindar.challenges.jsaliba.unit.perf.JMHBenchmarkTests.oneThreadGener
   (min, avg, max) = (0.557, 0.579, 0.588), stdev = 0.013
   CI (99.9%): [0.530, 0.627] (assumes normal distribution)
 ```
+
+# Continuous Integration (or lack thereof...)
+
+GitHub Actions workflows has not been implemented because of JMH - shared runners are likely to
+reject intensive workloads and hence would require dedicated agents to run this application's tests.
